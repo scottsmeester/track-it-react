@@ -1,9 +1,7 @@
-var express = require('express'),
-  http = require('http'),
-  path = require('path'),
-  mongoose = require('mongoose'),
-  routes = require('./routes'),
-  config = require('./config');
+var http = require('http'),
+    path = require('path'),
+    mongoose = require('mongoose'),
+    express = require('express');
 
 // Create an express instance and set a port variable
 var app = express();
@@ -18,21 +16,25 @@ app.set('views', __dirname + '/views');
 app.use(express.static(__dirname + '/public'));
 
 // app.use(express.static(__dirname));
+// Additional middleware which will set headers that we need on each request.
+app.use(function(req, res, next) {
+    // Set permissive CORS header - this allows this server to be used only as
+    // an API server in conjunction with something like webpack-dev-server.
+    res.setHeader('Access-Control-Allow-Origin', '*');
 
+    // Disable caching so we'll always get the latest comments.
+    res.setHeader('Cache-Control', 'no-cache');
+    next();
+});
 
 app.get('/', function(req, res) {
   res.render(path.join(__dirname, 'index.html'));
-    // res.render('templates/' + req.params.templateid);
 });
 
-// app.get('/', function (req, res) {
-//   res.send('Hello World!');
-// });
-
-// app.post('/', function (req, res) {
-//   res.send('Got a POST request');
-// });
-
 var server = app.listen(port, function() {
+  // if (err) {
+  //   console.log(err);
+  //   return;
+  // }
   console.log('Express server listening on port ' + server.address().port);
 });
